@@ -1,17 +1,10 @@
-name: GitHub Actions Demo for frontend
-
-
-on: 
-  push:
-    branches:
-      - main
-
+name: main
+on: workflow_dispatch
 jobs:
-  build-karna-hai:
+  build-and-test:
     runs-on: ubuntu-latest
+    name: Build and test
     steps:
-      - run: echo "hello world"
-      - run: npm install
-      - run: npm run build
-    
-
+      - uses: actions/checkout@v4
+      - uses: bahmutov/npm-install@v1
+      - run: npm t
