@@ -1,6 +1,7 @@
 name: React CI Pipeline
 
-on:
+on: 
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -14,41 +15,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository code
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node.js environment
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
           cache: npm
 
-      # 3️⃣ Cache node_modules for faster builds
-      - name: Cache node modules
-        uses: actions/cache@v4
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
-      # 4️⃣ Install dependencies
+
       - name: Install dependencies
         run: npm install
 
-      # 5️⃣ Run tests (optional but recommended)
-      - name: Run tests
-        run: npm test -- --watchAll=false
-        continue-on-error: true
 
-      # 6️⃣ Build React app
       - name: Build React app
         run: npm run build
         continue-on-error: true
 
-      # 7️⃣ Upload build artifact
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
