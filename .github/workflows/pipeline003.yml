@@ -96,8 +96,9 @@ jobs:
         with:
           name: build-artifact
           path: .
+          extract: false       # <-- DO NOT EXTRACT ZIP
 
-      - name: Debug list files (optional)
+      - name: Debug list files
         run: ls -R .
 
       - name: SCP Files
@@ -109,4 +110,3 @@ jobs:
           port: 22
           source: build.zip
           target: /tmp
-
