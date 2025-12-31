@@ -1,0 +1,76 @@
+name: optimized CI and CD 
+on: workflow_dispatch
+  #push:
+   # branches:
+    #  - main
+jobs:
+  build:
+    
+    runs-on: ubuntu-latest
+    steps:
+    
+      - name: Checkout
+        uses: actions/checkout@v6.0.1
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v6.1.0
+        
+      - name: Cache
+        uses: actions/cache@v5.0.1
+        # id: cache
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ runner.os }}-node
+          # restore-keys: ${{ runner.os }}-node
+          
+        
+      - name: Install dependencies and build
+        run: npm ci && npm run build
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          # name: Build_Artifact
+          path: build/
+      
+  deploy:  
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v7.0.0
+        # with:
+        #   name: Build_Artifact
+        #   path: build
+      - name: Copy files via SSH
+        uses: appleboy/scp-action@v1
+        with:
+          username: ${{ secrets.VM_USER }}
+          host: ${{ secrets.HOST }}
+          password: ${{ secrets.VM_PASSWORD }}
+          port: 22
+          # source: artifact.zip
+          target: /tmp/react-build
+          
+      - name: Execute remote SSH commands using password
+        uses: appleboy/ssh-action@v1
+        with: 
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.VM_USER }}
+          password: ${{ secrets.VM_PASSWORD }}
+          port: 22
+          script: |
+            sudo apt update
+            sudo apt install -y nginx
+            sudo cp -r /tmp/react-build/* /var/www/html
+          
+          
+
+          
+          
+        
+        
+    
