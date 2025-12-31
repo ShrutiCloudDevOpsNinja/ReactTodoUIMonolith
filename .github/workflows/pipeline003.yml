@@ -84,27 +84,32 @@ jobs:
           name: build-artifact
           path: build.zip
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Download a Build Artifact
-        uses: actions/download-artifact@v7.0.0
-        with:
-          name: build-artifact
-          path: .
-          extract: false     # <-- IMPORTANT (build.zip ko intact rakhta hai)
-
-      - name: Check files
-        run: ls -l .
-
-      - name: SCP Files to server
-        uses: appleboy/scp-action@v1
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.VM_USER }}
-          password: ${{ secrets.VM_PASSWORD }}
-          port: 22
-          source: "build.zip"   # <-- ab ye file present hogi
-          target: "/tmp"
+    deploy:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
+        
+              - name: Download artifact
+                uses: actions/download-artifact@v7.0.0
+                with:
+                  name: build-artifact
+                  path: .
+                  extract: false
+        
+              - name: SHOW CURRENT DIRECTORY
+                run: |
+                  echo "*** pwd ***"
+                  pwd
+                  echo "*** ls ***"
+                  ls -R .
+        
+              - name: SCP Files to server
+                uses: appleboy/scp-action@v1
+                with:
+                  host: ${{ secrets.HOST }}
+                  username: ${{ secrets.VM_USER }}
+                  password: ${{ secrets.VM_PASSWORD }}
+                  port: 22
+                  source: "build.zip"
+                  target: "/tmp"
+    
